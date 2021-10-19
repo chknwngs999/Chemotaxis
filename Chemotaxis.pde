@@ -3,8 +3,13 @@
 //right mouse to toggle trails
 //enter to reset board/bacteria
 //space to change background color
+//shift to toggle bias strength (experimental)
 
+//bias walk to have higher chance of moving towards mouse or move more towards mouse
+//toggle bias strength (always biased or only biased when moving right direction)
+//"species" of bacteria with "traits"
 boolean bias = true;
+boolean bias_strength = true;
 boolean clear = false;
 boolean trail = true;
 color bg = color((int)(Math.random()*256), (int)(Math.random()*256), (int)(Math.random()*256));
@@ -66,12 +71,15 @@ void keyPressed() {
       i++;
     }
   }
+  if (keyCode == SHIFT){
+    bias_strength = !bias_strength;
+  }
 }
 
 //count mouse touch bacteria
 //increased chance of moving towards mouse AND/OR increased movement when moving towards mouse/decreased movement when not moving towards mouse
 class Bacteria {
-  int myX, myY, oldX, oldY, xInc, yInc, dimension;
+  int myX, myY, oldX, oldY, xInc, yInc, dimension, speed;
   color linecolor;
   Bacteria() {
     myX = (int)(Math.random()*701);
@@ -80,25 +88,38 @@ class Bacteria {
     yInc = (int)(Math.random()*9)-4;
     linecolor = color((int)(Math.random()*256), (int)(Math.random()*256), (int)(Math.random()*256));
     dimension = (int)(Math.random()*70+10);
+    speed = 16 - dimension/5;
   }
   void walk() {
     oldX = myX;
     oldY = myY;
     if (bias) {
-      if (mouseX > myX && xInc > 0)
-        xInc += 2;
-      else if (mouseX < myX && xInc < 0)
-        xInc -= 2;
-
-      if (mouseY > myY && yInc > 0)
-        yInc += 2;
-      else if (mouseY < myY && yInc < 0)
-        yInc -= 2;
+      if (bias_strength){ 
+        if (mouseX > myX)
+          xInc += 2;
+        else if (mouseX < myX)
+          xInc -= 2;
+  
+        if (mouseY > myY)
+          yInc += 2;
+        else if (mouseY < myY)
+          yInc -= 2;
+      } else { 
+        if (mouseX > myX && xInc > 0)
+          xInc += 2;
+        else if (mouseX < myX && xInc < 0)
+          xInc -= 2;
+  
+        if (mouseY > myY && yInc > 0)
+          yInc += 2;
+        else if (mouseY < myY && yInc < 0)
+          yInc -= 2;
+      }
     }
     myX += xInc;
     myY += yInc;
-    xInc = (int)(Math.random()*9)-4;
-    yInc = (int)(Math.random()*9)-4;
+    xInc = (int)(Math.random()*(9+speed))-((9+speed)/2)+((9+speed)%2);
+    yInc = (int)(Math.random()*(9+speed))-((9+speed)/2)+((9+speed)%2);
   }
   void show() {
     fill(linecolor);
