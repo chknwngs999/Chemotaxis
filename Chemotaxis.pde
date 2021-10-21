@@ -4,6 +4,8 @@
 //enter to reset board/bacteria
 //space to change background color
 //shift to toggle bias strength (experimental)
+//backspace to toggle growth/shrink
+//hover over bacteria to change size
 
 //bias walk to have higher chance of moving towards mouse or move more towards mouse
 //toggle bias strength (always biased or only biased when moving right direction)
@@ -12,11 +14,12 @@ boolean bias = true;
 boolean bias_strength = true;
 boolean clear = false;
 boolean trail = true;
+boolean growth = true;
 color bg = color((int)(Math.random()*256), (int)(Math.random()*256), (int)(Math.random()*256));
 Bacteria [] bacteria = new Bacteria[(int)(Math.random()*26+5)];
 
 void setup() {
-  size(700, 700);
+  size(1000, 1000);
   background(bg);
 
   int i = 0;
@@ -37,10 +40,11 @@ void draw() {
       fill(bg, 15);
     }
   }
-  rect(0, 0, 700, 700);
+  rect(0, 0, 1000, 1000);
 
   for (int i = 0; i < bacteria.length; i++) {
     bacteria[i].walk();
+    bacteria[i].grow();
     bacteria[i].show();
   }
 }
@@ -74,6 +78,9 @@ void keyPressed() {
   if (keyCode == SHIFT){
     bias_strength = !bias_strength;
   }
+  if (keyCode == BACKSPACE){
+    growth = !growth;
+  }
 }
 
 //count mouse touch bacteria
@@ -82,13 +89,15 @@ class Bacteria {
   int myX, myY, oldX, oldY, xInc, yInc, dimension, speed;
   color linecolor;
   Bacteria() {
-    myX = (int)(Math.random()*701);
-    myY = (int)(Math.random()*701);
+    myX = (int)(Math.random()*1001);
+    myY = (int)(Math.random()*1001);
     xInc = (int)(Math.random()*9)-4;
     yInc = (int)(Math.random()*9)-4;
     linecolor = color((int)(Math.random()*256), (int)(Math.random()*256), (int)(Math.random()*256));
-    dimension = (int)(Math.random()*70+10);
+    dimension = (int)(Math.random()*40+20);
     speed = 16 - dimension/5;
+    if (speed < 0)
+      speed = 1;
   }
   void walk() {
     oldX = myX;
@@ -120,6 +129,19 @@ class Bacteria {
     myY += yInc;
     xInc = (int)(Math.random()*(9+speed))-((9+speed)/2)+((9+speed)%2);
     yInc = (int)(Math.random()*(9+speed))-((9+speed)/2)+((9+speed)%2);
+  }
+  void grow(){
+    if (abs(dist(mouseX, mouseY, myX, myY)) <= dimension)
+      if (growth){
+        dimension += 1;
+      } else {
+        dimension -= 1;
+        if (dimension <= 0)
+          dimension = 1;
+      }
+      speed = 35 - dimension/3;
+      if (speed < 0)
+        speed = 1;
   }
   void show() {
     fill(linecolor);
