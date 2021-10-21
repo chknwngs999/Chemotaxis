@@ -78,8 +78,11 @@ void keyPressed() {
   if (keyCode == SHIFT){
     bias_strength = !bias_strength;
   }
-  if (keyCode == BACKSPACE){
-    growth = !growth;
+  if (keyCode == UP){
+    growth = true;
+  }
+  if (keyCode == DOWN){
+    growth = false;
   }
 }
 
